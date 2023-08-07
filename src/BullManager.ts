@@ -12,15 +12,21 @@ import {
 
 import {
   Queue,
-  QueueScheduler,
+  // QueueScheduler,
   JobsOptions,
   Job as BullJob,
   Worker,
   WorkerOptions,
   Processor,
 } from 'bullmq'
-import * as BullBoard from 'bull-board'
-import { BullMQAdapter } from 'bull-board/bullMQAdapter'
+
+const express = require('express')
+import * as BullBoard from '@bull-board/api'
+import { BullMQAdapter } from '@bull-board/api/bullMQAdapter'
+import { ExpressAdapter } from '@bull-board/express'
+
+// import * as BullBoard from 'bull-board'
+// import { BullMQAdapter } from 'bull-board/bullMQAdapter'
 
 export class BullManager implements BullManagerContract {
   constructor(
@@ -49,8 +55,8 @@ export class BullManager implements BullManagerContract {
 
       const jobListeners = this._getEventListener(jobDefinition)
 
-      // eslint-disable-next-line no-new
-      new QueueScheduler(jobDefinition.key, queueConfig)
+      new Queue(jobDefinition.key, queueConfig)
+      // new QueueScheduler(jobDefinition.key, queueConfig)
 
       queues[jobDefinition.key] = Object.freeze({
         bull: new Queue(jobDefinition.key, queueConfig),
@@ -117,14 +123,24 @@ export class BullManager implements BullManagerContract {
   }
 
   /* istanbul ignore next */
-  public ui(port = 9999) {
-    const board = BullBoard.createBullBoard(
-      Object.keys(this.queues).map(
-        (key) => new BullMQAdapter(this.getByKey(key).bull)
-      )
-    )
+  public ui(port = 9999, basePath = '/worker/queues') {
+    const serverAdapter = new ExpressAdapter()
+    serverAdapter.setBasePath(basePath)
 
-    const server = board.router.listen(port, () => {
+    const board = BullBoard.createBullBoard({
+      queues: Object.keys(this.queues).map(
+        (key) => new BullMQAdapter(this.getByKey(key).bull)
+      ),
+      serverAdapter,
+    })
+
+    const app = express()
+    app.use(basePath, serverAdapter.getRouter())
+
+    // other configurations of your server
+
+    const server = app.listen(3000, () => {
+      // const server = board.router.listen(port, () => {
       this.Logger.info(`bull board on http://localhost:${port}`)
     })
 

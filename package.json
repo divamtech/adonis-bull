@@ -36,12 +36,6 @@
   "directories": {
     "test": "test"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged",
-      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
-    }
-  },
   "lint-staged": {
     "*.ts": [
       "yarn lint --fix",
@@ -107,11 +101,13 @@
     "url": "git+https://github.com/rocketseat/adonis-bull.git"
   },
   "peerDependencies": {
-    "@adonisjs/core": "^5.0.4-preview-rc"
+    "@adonisjs/core": "^5.9.0"
   },
   "dependencies": {
-    "bull-board": "^2.0.3",
-    "bullmq": "4.7.0"
+    "@bull-board/api": "^5.7.1",
+    "@bull-board/express": "^5.7.1",
+    "bullmq": "4.7.0",
+    "express": "^4.18.2"
   },
   "files": [
     "build/adonis-typings",
