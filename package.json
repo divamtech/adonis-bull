@@ -111,7 +111,7 @@
   },
   "dependencies": {
     "bull-board": "^2.0.3",
-    "bullmq": "^1.24.5"
+    "bullmq": "4.7.0"
   },
   "files": [
     "build/adonis-typings",
